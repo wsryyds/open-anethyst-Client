@@ -1,0 +1,93 @@
+Amethyst Client
+All Rights Reserved, with a limited licence to run the Work
+
+Copyright (c) 2026 CJJ1789 (https://github.com/CJJ1789). All rights reserved.
+
+This software, including its source code, compiled binaries, assets, user
+interface design and documentation (the "Work"), is proprietary and protected
+by copyright law. It is NOT open source: no source code is published, and no
+right to obtain or receive the source code is granted by this licence.
+
+------------------------------------------------------------------------------
+1. LIMITED LICENCE (what you are permitted to do)
+
+Subject to the restrictions in section 2, the copyright holder grants you a
+limited, non-exclusive, non-transferable, revocable, royalty-free licence to:
+
+  (a) download the Work, free of charge, from its official release page
+      (https://github.com/CJJ1789/Amethyst-Client/releases);
+  (b) install and run the Work for your own personal, non-commercial use
+      together with Minecraft;
+  (c) keep backup copies of the unmodified jar for your own use, and install
+      it on computers you personally own or use;
+  (d) play on any multiplayer server with the Work installed, subject to that
+      server's own rules and to the Minecraft EULA.
+
+No other rights are granted, whether by implication, estoppel or otherwise.
+
+------------------------------------------------------------------------------
+2. RESTRICTIONS (what you are NOT permitted to do)
+
+Without the prior written permission of the copyright holder, you may not:
+
+  (a) redistribute, publish, mirror, re-upload, bundle, sublicense, sell, rent,
+      lease or otherwise make the Work (or any part of it) available to third
+      parties, including in mod packs, launchers, websites, app stores, video
+      descriptions or file-sharing services;
+  (b) modify, adapt, translate, merge or create derivative works from the Work;
+  (c) reverse engineer, decompile, disassemble or otherwise attempt to derive
+      the source code of the Work, or extract its assets (textures, fonts,
+      icon atlases, sounds, data files) for use in other projects;
+  (d) remove, obscure or alter any copyright, licence or attribution notice;
+  (e) use the Work, or any part of it, to provide a paid service, or in any
+      commercial product or commercial distribution;
+  (f) use the Work's name, icon or branding to promote anything else, or in any
+      way that suggests endorsement by the copyright holder.
+
+Nothing in this section restricts rights that mandatory law grants you, nor the
+rights granted by the third-party licences listed in section 4.
+
+------------------------------------------------------------------------------
+3. NO WARRANTY / LIMITATION OF LIABILITY
+
+The Work is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. To the maximum extent permitted by law, the copyright
+holder is not liable for any claim, damage or other liability arising from the
+Work or its use, including any action taken against you by a server operator or
+by Mojang Studios / Microsoft.
+
+------------------------------------------------------------------------------
+4. THIRD-PARTY COMPONENTS (exception to this licence)
+
+This distribution contains third-party components that remain under their own
+copyright and licences. Those licences apply to those components only, and
+nothing in this document restricts the rights granted by them. See NOTICE.txt
+and the files under licenses/ for full copyright notices and licence texts.
+
+Third-party components:
+  1. JNA 5.17.0 (Apache-2.0) - shipped as the nested jar META-INF/jars/jna-5.17.0.jar;
+     see licenses/APACHE-2.0.txt.
+  2. McPacks / FastPacks 1.0 (MIT) - the resource pack manager under com/mcpacks/**,
+     a modified Legacy Fabric port of upstream FastPacks / McPacks
+     (https://modrinth.com/mod/fastpacks; author "McPacks Team", Modrinth owner
+     Dulandor). The port was never released standalone and is bundled only as
+     this client's built-in pack manager; see licenses/FASTPACKS-MIT.txt.
+  3. Upstream font/icon resources baked into assets/md3/**: Roboto and Material
+     Icons (Apache-2.0). The net/client/ui/md3 code itself was written for this
+     project. See licenses/MD3-THIRD-PARTY.md.
+  4. Noto Sans CJK glyph atlases (SIL-OFL-1.1) - CJK glyphs baked into assets/md3/font/
+     at build time from Noto Sans CJK SC; the original font files are not distributed.
+     See licenses/NOTO-OFL-1.1.txt.
+  5. Minecraft (Mojang Studios / Microsoft) - subject to the Minecraft EULA.
+     This Work is not affiliated with, endorsed by, or associated with
+     Mojang Studios or Microsoft.
+
+------------------------------------------------------------------------------
+5. TERMINATION
+
+Any breach of this licence terminates the rights granted in section 1
+automatically. On termination you must stop using the Work and delete all
+copies in your possession.
+
+[End of file.]

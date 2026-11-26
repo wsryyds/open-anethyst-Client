@@ -1,0 +1,212 @@
+第三方声明 / THIRD-PARTY NOTICES
+==============================
+
+【中文】Client
+版权所有 (c) 2026 Client 贡献者，保留所有权利。
+本项目采用「保留所有权利（All Rights Reserved）」许可，并授予有限的终端用户运行许可
+（见 LICENSE）：允许免费下载、安装、个人非商业使用，禁止再分发、
+修改与反向工程。本项目不开源，不提供源代码。
+
+本产物包含第三方作品。其版权与许可条款列于下方，并同时附在 licenses/ 目录内。
+这些条款仅适用于对应的第三方组件，不被本项目的「保留所有权利」声明覆盖或取代。
+中文仅便于阅读，若与英文原文有歧义，以英文原文为准。
+
+【English】Client
+Copyright (c) 2026 Client contributors. All rights reserved.
+Licensed under: All Rights Reserved, with a limited end-user licence to run
+the Work (see LICENSE). The project's own code, UI design and assets are
+proprietary and the source code is not published.
+
+This product includes third-party works. Their copyright and license terms
+are reproduced below and in the files under licenses/. These terms apply to
+those components only and are not superseded by the project's All Rights
+Reserved license. Where the Chinese translation and the English original
+differ, the English original prevails.
+
+
+1. JNA 5.17.0（Java Native Access）
+   文件：META-INF/jars/jna-5.17.0.jar（嵌套 jar，随本模组 jar 分发）
+   版权：Copyright (c) 2007-2024 JNA contributors（上游 Apache-2.0，已裁剪：
+         仅保留 Windows 三架构的 jnidispatch 原生库，.class 文件未修改）
+   许可：Apache License 2.0（上游为 Apache-2.0 / LGPL 2.1 双许可；本项目选择按 Apache-2.0 使用）
+   上游：https://github.com/java-native-access/jna
+   全文：licenses/APACHE-2.0.txt
+   说明：类文件未修改，原生库按 Windows 三个架构裁剪后分发。仅用于 Windows 平台下通过 IMM32
+         读取中文输入法的组字串与候选窗位置；非 Windows 平台不会加载。
+         若按 LGPL 2.1 使用，其余条款不变，本项目的选择不影响接收者的权利。
+
+   [EN] Files: META-INF/jars/jna-5.17.0.jar (nested jar, redistributed inside this mod jar).
+        Copyright (c) 2007-2024 JNA contributors. Unmodified binary redistribution.
+        License: Apache License 2.0 (upstream is dual-licensed Apache-2.0 / LGPL 2.1;
+        this project elects Apache-2.0).
+        Upstream: https://github.com/java-native-access/jna
+        Full text: licenses/APACHE-2.0.txt
+        Note: used only on Windows to read IME composition strings and candidate
+        window position through IMM32; not loaded on other platforms.
+
+2. McPacks / FastPacks 1.0
+   文件：com/mcpacks/**（上游 FastPacks/McPacks 的 Legacy Fabric 移植版）
+         assets/mcpacks/textures/gui/*.png
+         mcpacks.mixins.json
+   上游：FastPacks / McPacks，Forge 1.8.9；模组内作者署名 McPacks Team，
+         Modrinth 所有者 Dulandor；https://modrinth.com/mod/fastpacks
+   版权：Copyright (c) 2025 McPacks Team (Modrinth owner: Dulandor)
+   许可：MIT
+   全文：licenses/FASTPACKS-MIT.txt
+   说明：本项目将上游模组移植到 Legacy Fabric 并作修改（调整了映射与
+         纹理初始化时机）。该移植版从未作为独立模组公开发布，仅内置为本
+         客户端的资源包管理器随包分发；上游版权声明与 MIT 许可全文保留，
+         不影响本项目其余部分的保留全部权利条款。
+
+   [EN] Files: com/mcpacks/** (Legacy Fabric port of upstream FastPacks/McPacks),
+        assets/mcpacks/textures/gui/*.png, mcpacks.mixins.json.
+        Upstream: FastPacks / McPacks, Forge 1.8.9; in-mod author "McPacks
+        Team", Modrinth owner Dulandor; https://modrinth.com/mod/fastpacks.
+        Copyright (c) 2025 McPacks Team (Modrinth owner: Dulandor). License: MIT.
+        Full text: licenses/FASTPACKS-MIT.txt
+        Note: MODIFIED (ported from Forge 1.8.9 to Legacy Fabric, with
+        mapping and texture-init timing adjustments). The port was never
+        released as a standalone mod and is bundled only as this client's
+        built-in resource pack manager. Original copyright
+        notice and MIT text retained.
+
+
+3. Blur（背景模糊实现移植）
+   文件：net/client/util/BackdropBlurPipeline.java（编译期以字符串形式内嵌着色器）
+   上游：Blur，https://github.com/tterrag1098/Blur
+   版权：Copyright (c) 2017 tterrag
+   许可：MIT
+   全文：licenses/BLUR-MIT.txt
+   说明：背景模糊的片元着色器（fade_in_blur.fsh）与四段式 pass 流程
+         （水平→垂直→水平→垂直）逐字移植自上游，仅把驱动方式从原版后处理
+         管线改为自建的全分辨率乒乓帧缓冲（1.8.9 的原版后处理无法按帧修改
+         uniform）。上游版权声明与 MIT 许可全文保留。
+
+   [EN] Files: net/client/util/BackdropBlurPipeline.java (fragment shader inlined
+        as a string at build time).
+        Upstream: Blur, https://github.com/tterrag1098/Blur.
+        Copyright (c) 2017 tterrag. License: MIT.
+        Full text: licenses/BLUR-MIT.txt
+        Note: MODIFIED -- the fragment shader (fade_in_blur.fsh) and the four-pass
+        pipeline (horizontal -> vertical -> horizontal -> vertical) are copied
+        verbatim from upstream; only the driver was changed to a self-managed
+        full-resolution ping-pong framebuffer, because Minecraft 1.8.9's built-in
+        post-processing pipeline cannot update uniforms per frame. Original
+        copyright notice and MIT text retained.
+
+4. Roboto / Material Icons（assets/md3 图集内烘焙的字体与图标）
+   文件：assets/md3/font/*.png（Roboto 拉丁字形）、
+         assets/md3/icon/material_icons.png（Material Icons 图标）
+   版权：Copyright 2011 Google Inc.（Roboto）；
+         Copyright 2014 Google Inc.（Material Icons）
+   许可：Apache License, Version 2.0
+   上游：https://github.com/googlefonts/roboto
+         https://github.com/google/material-design-icons
+   全文：licenses/APACHE-2.0.txt
+   说明：已修改（构建期栅格化 + 子集化）。上游 TTF 文件不随 jar 分发，
+         烘焙出的位图图集随 jar 分发；清单另见 licenses/MD3-THIRD-PARTY.md。
+
+   [EN] Files: assets/md3/font/*.png (Roboto Latin glyphs) and
+        assets/md3/icon/material_icons.png (Material Icons).
+        Copyright 2011 Google Inc. (Roboto); Copyright 2014 Google Inc.
+        (Material Icons). License: Apache-2.0.
+        Upstream: https://github.com/googlefonts/roboto,
+        https://github.com/google/material-design-icons
+        Full text: licenses/APACHE-2.0.txt
+        Note: MODIFIED (rasterised + subset at build time). The upstream TTF
+        files are not distributed; only the baked bitmap atlases ship in the
+        jar. See also licenses/MD3-THIRD-PARTY.md.
+
+
+4. Noto Sans / Noto Sans CJK（构建期栅格化，仅图集随 jar 分发）
+   文件：assets/md3/font/*.png 中的 CJK 字形（构建期由 Noto Sans CJK SC 栅格化而来）
+   版权：Copyright 2014-2021 Adobe (http://www.adobe.com/),
+         其中保留字体名称 'Source' 归 Adobe 所有；
+         Copyright 2012 Google Inc. All Rights Reserved.
+   许可：SIL Open Font License 1.1（SIL-OFL-1.1）
+   上游：https://fonts.google.com/noto
+   全文：licenses/NOTO-OFL-1.1.txt
+   说明：已修改（栅格化 + 子集化）。上游 Noto 字形只用于构建期把字形烘焙进
+         本项目的 MD3 字体图集，原始 TTC 文件不随 jar 分发；烘焙出的图集属于
+         OFL 1.1 意义上的“修改版本”，仍按 OFL 1.1 分发，版权声明与许可全文随 jar
+         保留，未使用保留字体名称作为修改版本的主名称。本项目自身代码/素材的
+         「保留所有权利」不覆盖字体本身，二者互不冲突。
+
+   [EN] Files: the CJK glyphs inside assets/md3/font/*.png, rasterised at build
+        time from Noto Sans CJK SC. Copyright 2014-2021 Adobe (Reserved Font
+        Name 'Source'), Copyright 2012 Google Inc. All Rights Reserved.
+        License: SIL OFL 1.1. Upstream: https://fonts.google.com/noto
+        Full text: licenses/NOTO-OFL-1.1.txt
+        Note: MODIFIED (rasterised + subset). The upstream Noto fonts are only
+        used at build time to bake glyphs into this project's MD3 font atlases;
+        the original TTC files are not distributed. The resulting atlases are a
+        "Modified Version" under OFL 1.1 and remain under OFL 1.1, with the
+        copyright notice and license text shipped in the jar and no Reserved
+        Font Name used as the primary name of the modified version. The
+        project's own All-Rights-Reserved license does not cover the typeface
+        and does not conflict with OFL.
+
+
+5. Minecraft
+   本产物是 Minecraft Java 版（1.8.9）的修改作品。
+   Minecraft 版权归 Mojang Studios / Microsoft 所有，游戏的使用受
+   Minecraft 最终用户许可协议（EULA）与 Minecraft 使用指南约束。
+   本项目与 Mojang Studios、Microsoft 无任何隶属、背书、赞助或关联关系。
+   本 jar 不再分发任何 Minecraft 游戏代码或游戏素材；jar 内只有本项目自制的
+   代码与素材，以及上列第三方组件。
+
+   [EN] This is a modification for Minecraft Java Edition (1.8.9).
+        Minecraft is Copyright Mojang Studios / Microsoft. Use of the game is
+        governed by the Minecraft End User License Agreement and the Minecraft
+        Usage Guidelines. This project is not affiliated with, endorsed by,
+        sponsored by, or associated with Mojang Studios or Microsoft.
+        No Minecraft game code or game assets are redistributed in this jar.
+
+
+6. 构建期依赖（不随本 jar 分发）
+   Minecraft 1.8.9 客户端、Fabric Loader、Fabric API、Yarn 映射、Fabric Loom、ASM。
+   这些依赖由游戏、模组加载器或构建工具链在构建/运行时提供，不会被打包进本 jar，
+   各自适用其自身的许可条款。
+
+   [EN] Build-time dependencies (NOT redistributed in this jar):
+        Minecraft 1.8.9 client, Fabric Loader, Fabric API, Yarn mappings,
+        Fabric Loom, ASM. These are provided at build/run time and are not
+        bundled into this jar.
+
+
+原创性声明 / Statement on original authorship
+--------------------------------------------
+【中文】本项目 net.client 与 net.client.ui.md3 包下的全部 Java 源代码
+（含 net.client.replay.* 回放子系统）均为本项目自行编写；回放子系统不含
+ReplayMod 代码。唯一的第三方代码是背景模糊实现 net.client.util.BackdropBlurPipeline，
+其着色器与 pass 流程移植自 Blur（MIT，见第 3 项）。
+jar 内只包含：
+  1) 本项目自行编写的代码与素材（含 assets/client、assets/md3 下的界面素材）；
+  2) 第 1 项第三方组件（JNA，Apache-2.0，以嵌套 jar 形式分发）；
+  3) 第 2 项 McPacks / FastPacks 移植代码（MIT）；
+  4) 第 3 项 Blur 背景模糊着色器的移植代码（MIT）；
+  5) 第 4 项 Roboto / Material Icons 字体与图标（Apache-2.0）；
+  6) 第 5 项 Noto 字形图集（OFL-1.1，仅构建期栅格化后的图集）。
+除此之外不再分发任何其它内容：不内嵌任何字体资源包（高清字体功能已移除），
+也不含 ReplayMod 或其它客户端/模组的代码。回放子系统与 MD3 界面套件均为本项目
+为本客户端自研，从未作为独立项目以任何开源许可对外发布。
+
+【English】All Java source code under net.client and net.client.ui.md3 in this project (including the
+replay subsystem net.client.replay.*) was written for this project. No source
+code from any other Minecraft mod or client was copied into this project, and the
+replay subsystem contains no ReplayMod code.
+The jar contains only:
+  1) code and assets created for this project (including the UI assets under
+     assets/client and assets/md3);
+  2) the third-party component listed in item 1 above (JNA, Apache-2.0, shipped as
+     a nested jar);
+  3) the McPacks / FastPacks port in item 2 (MIT);
+  4) the Roboto / Material Icons fonts and icons in item 3 (Apache-2.0);
+  5) the Noto glyph atlases in item 4 (OFL-1.1, build-time rasterised atlases only).
+Nothing else is redistributed: no font resource pack is embedded (the HD font
+feature has been removed), and there is no ReplayMod or other mod/client
+code in the jar. The replay subsystem and the MD3 UI kit were developed by
+this project for this client and were never released publicly under any open
+source licence as standalone projects.
+
+[End of file / 文件结束]

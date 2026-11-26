@@ -1,0 +1,169 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+
+// The recovered sources already use intermediary names; remap vanilla, not the mod.
+def scratch = rootProject.layout.projectDirectory.dir('../tmp/amethyst-build').asFile
+def lib = new File(scratch, 'lib')
+def temp = new File(scratch, 'temp')
+def vanilla = new File(scratch, 'minecraft-1.8.9-client.jar')
+def mapped = new File(scratch, 'minecraft-intermediary.jar')
+def mappings = new File(scratch, 'mappings.jar')
+def remapper = new File(scratch, 'tiny-remapper.jar')
+def vanillaSha = '3870888a6c3d349d3771a3e9d16c9bf5e076b908'
+def fabric = 'https://maven.fabricmc.net/'
+def legacy = 'https://maven.legacyfabric.net/'
+def mojang = 'https://libraries.minecraft.net/'
+def bmcl = 'https://bmclapi2.bangbang93.com/'
+def aliyun = 'https://maven.aliyun.com/repository/public/'
+def proxies = [Proxy.NO_PROXY]
+def proxySetting = providers.environmentVariable('AMETHYST_PROXY').orElse('http://127.0.0.1:7890').get()
+if (proxySetting) {
+    def uri = URI.create(proxySetting)
+    proxies.add(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(uri.host, uri.port < 0 ? 80 : uri.port)))
+}
+
+def libraries = [
+    'net.fabricmc:fabric-loader:0.20.1': fabric,
+    'net.fabricmc:sponge-mixin:0.17.5+mixin.0.8.7': fabric,
+    'com.google.guava:guava:17.0': mojang,
+    'com.google.code.gson:gson:2.2.4': mojang,
+    'com.mojang:authlib:1.5.21': mojang,
+    'io.netty:netty-all:4.0.23.Final': mojang,
+    'org.apache.logging.log4j:log4j-api:2.0-beta9': mojang,
+    'org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209': mojang,
+    'org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209': mojang,
+    'com.paulscode:codecjorbis:20101023': mojang,
+    'com.paulscode:soundsystem:20120107': mojang,
+].collectEntries { gav, upstream ->
+    def (group, artifact, version) = gav.split(':')
+    def name = "${artifact}-${version}.jar"
+    def path = "${group.replace('.', '/')}/${artifact}/${version}/${name}"
+    [(new File(lib, name)): [upstream + path, aliyun + path, bmcl + 'maven/' + path]]
+}
+
+def validJar = { File file, String sha = null ->
+    if (!file.isFile()) return false
+    try {
+        new ZipFile(file).close()
+        return !sha || MessageDigest.getInstance('SHA-1').digest(file.bytes).encodeHex().toString() == sha
+    } catch (IOException ignored) {
+        return false
+    }
+}
+
+def replace = { File from, File to -> Files.move(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING) }
+def fetch = { File file, List urls, String sha = null ->
+    if (validJar(file, sha)) return
+    def partial = File.createTempFile(file.name, '.part', file.parentFile)
+    try {
+        for (def proxy : proxies) {
+            for (def url : (proxy == Proxy.NO_PROXY ? urls : [urls[0]])) {
+                def connection = URI.create(url.toString()).toURL().openConnection(proxy)
+                connection.connectTimeout = 5000
+                connection.readTimeout = 35000
+                try {
+                    connection.inputStream.withCloseable { Files.copy(it, partial.toPath(), StandardCopyOption.REPLACE_EXISTING) }
+                    if (!validJar(partial, sha)) throw new IOException('Invalid JAR or checksum')
+                    replace(partial, file)
+                    logger.lifecycle("Downloaded ${file.name}")
+                    return
+                } catch (IOException failure) {
+                    logger.info("Download failed for ${url}: ${failure.message}")
+                } finally {
+                    connection.disconnect()
+                }
+            }
+        }
+        throw new GradleException("Unable to download ${file.name} from ${urls}")
+    } finally {
+        Files.deleteIfExists(partial.toPath())
+    }
+}
+
+abstract class BuildProcesses {
+    @javax.inject.Inject
+    abstract org.gradle.process.ExecOperations getExecOperations()
+}
+def executors = objects.newInstance(BuildProcesses).execOperations
+def javaBin = new File(System.getProperty('java.home'), 'bin/java').absolutePath
+
+def prepareMinecraft = tasks.register('prepareMinecraft') {
+    doLast {
+        lib.mkdirs()
+        temp.mkdirs()
+        libraries.each { file, urls -> fetch(file, urls) }
+        fetch(mappings, [legacy + 'net/legacyfabric/intermediary/1.8.9/intermediary-1.8.9-v2.jar'])
+        fetch(remapper, [fabric + 'net/fabricmc/tiny-remapper/0.13.1/tiny-remapper-0.13.1-fat.jar'])
+        if (!validJar(vanilla, vanillaSha)) {
+            def local = providers.environmentVariable('AMETHYST_MINECRAFT_JAR').orNull
+            if (local) {
+                def supplied = new File(local)
+                if (!validJar(supplied, vanillaSha)) throw new GradleException('AMETHYST_MINECRAFT_JAR is not the vanilla 1.8.9 client')
+                Files.copy(supplied.toPath(), vanilla.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            } else {
+                fetch(vanilla, ["https://launcher.mojang.com/v1/objects/${vanillaSha}/client.jar", bmcl + "v1/objects/${vanillaSha}/client.jar"], vanillaSha)
+            }
+        }
+        if (!validJar(mapped)) {
+            def tiny = new File(scratch, 'intermediary.tiny')
+            new ZipFile(mappings).withCloseable { zip ->
+                zip.getInputStream(zip.getEntry('mappings/mappings.tiny')).withCloseable {
+                    Files.copy(it, tiny.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                }
+            }
+            def staging = new File(scratch, 'minecraft-remap-staging.jar')
+            Files.deleteIfExists(staging.toPath())
+            try {
+                executors.exec {
+                    commandLine javaBin, "-Djava.io.tmpdir=${temp}", '-jar', remapper, vanilla, staging, tiny, 'official', 'intermediary'
+                }
+                replace(staging, mapped)
+            } finally {
+                Files.deleteIfExists(staging.toPath())
+            }
+        }
+    }
+}
+
+dependencies {
+    compileOnly files(mapped, new File(projectDir, 'src/main/resources/META-INF/jars/jna-win-5.17.0.jar'))
+    compileOnly files(libraries.keySet())
+}
+tasks.withType(JavaCompile).configureEach { dependsOn prepareMinecraft }
+
+def entries = { ZipFile zip ->
+    def names = zip.entries().findAll { !it.directory }.collect { it.name }
+    def unique = names.toSet()
+    if (unique.size() != names.size()) throw new GradleException("Duplicate entries in ${zip.name}")
+    unique
+}
+def jarTask = tasks.named('jar')
+tasks.register('verifyReconstruction') {
+    dependsOn jarTask
+    doLast {
+        def original = new File(projectDir, '../Amethyst-Client-1.0.1.jar')
+        def rebuilt = jarTask.get().archiveFile.get().asFile
+        new ZipFile(original).withCloseable { oldJar ->
+            new ZipFile(rebuilt).withCloseable { newJar ->
+                def expected = entries(oldJar)
+                def actual = entries(newJar)
+                if (expected != actual) {
+                    throw new GradleException("Missing: ${(expected - actual).sort()}\nUnexpected: ${(actual - expected).sort()}")
+                }
+                def resources = expected.findAll { !it.endsWith('.class') }
+                resources.each { name ->
+                    def oldBytes = oldJar.getInputStream(oldJar.getEntry(name)).withCloseable { it.bytes }
+                    def newBytes = newJar.getInputStream(newJar.getEntry(name)).withCloseable { it.bytes }
+                    if (!Arrays.equals(oldBytes, newBytes)) throw new GradleException("Resource content differs: ${name}")
+                }
+                logger.lifecycle("${expected.size() - resources.size()} class paths and ${resources.size()} identical resource entries verified.")
+            }
+        }
+        executors.exec {
+            commandLine javaBin, "-Djava.io.tmpdir=${temp}", '-cp', remapper, new File(projectDir, 'CompareClasses.java'), original, rebuilt
+        }
+    }
+}
+

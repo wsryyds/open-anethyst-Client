@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.amethyst.blur.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "ScreenMixin",
+    "MinecraftClientMixin",
+    "ShaderEffectMixin",
+    "MinecraftClientAccessor",
+    "GameRendererInvoker",
+    "ShaderEffectAccessor",
+    "PostProcessShaderAccessor",
+    "DrawableHelperInvoker"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

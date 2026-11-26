@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+}
+
+version = '1.0.1'
+
+layout.buildDirectory = layout.projectDirectory.dir('../tmp/amethyst-build/gradle-build')
+apply from: 'gradle/minecraft.gradle'
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+    options.incremental = false
+    // The Mixin descriptors/annotations in the recovered sources are already remapped.
+    options.compilerArgs.add('-proc:none')
+}
+
+tasks.named('processResources') {
+    exclude 'META-INF/MANIFEST.MF'
+}
+
+tasks.named('jar') {
+    archiveBaseName = 'Amethyst-Client'
+    archiveClassifier = 'rebuilt'
+    reproducibleFileOrder = true
+    preserveFileTimestamps = false
+    manifest.from('src/main/resources/META-INF/MANIFEST.MF')
+}
+
+def stagedJar = tasks.named('jar').flatMap { it.archiveFile }
+tasks.register('exportJar', Copy) {
+    from stagedJar
+    into layout.projectDirectory.dir('dist')
+}
+tasks.named('assemble') { dependsOn 'exportJar' }
+tasks.named('clean') { delete layout.projectDirectory.dir('dist') }
