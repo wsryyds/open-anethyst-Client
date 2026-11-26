@@ -56,7 +56,7 @@ Amethyst-Client-rebuilt/
 
 前面正经的读我写完了 接下来进入正题
 
-Amethyst Client 是一个面向 2015 年老古董 **Minecraft 1.8.9** 制作的 [Legacy Fabric](https://legacyfabric.net/) PvP 客户端  看起来非常现代 可惜作者的大脑疑似遭到了碾压居然在1.8.9制作fabirc模组非常有 Material Design 3 审美 甚至在 `LICENSE` 里写了一篇堪比联合国宪章的 `All-Rights-Reserved` 声明严禁反编译严禁逆向严禁提取任何资源 仿佛里面藏着什么价值连城的核聚变源代码 但是笔者把这个 **13.65 MB** 的肥美 jar 扔进反编译器之后 发现里面的精彩程度已经远远超出了 PvP 客户端的范畴 本文将带你逐行观赏它到底是个什么东西
+Amethyst Client 是一个面向 2015 年老古董 **Minecraft 1.8.9** 制作的 [Legacy Fabric](https://legacyfabric.net/) PvP 客户端  看起来非常现代 可惜作者的大脑疑似遭到了碾压居然在1.8.9制作fabirc模组非常有 Material Design 3 审美 甚至在 `LICENSE` 里写了一篇堪比联合国宪章的 `All-Rights-Reserved` 声明严禁反编译严禁逆向严禁提取任何资源 仿佛里面藏着什么价值连城的核聚变源代码 但是笔者把这个 **13.65 MB** 的肥美 jar 扔进反编译器之后 发现里面的精彩程度已经远远超出了 PvP 客户端的范畴 可惜作者的大脑疑似遭到了碾压居然在1.8.9制作fabirc模组 本文将带你逐行观赏它到底是个什么东西
 
 ### 一 把防盗门焊死在草坪正中央的闭源哲学
 
@@ -70,11 +70,19 @@ Amethyst Client 是一个面向 2015 年老古董 **Minecraft 1.8.9** 制作的 
 
 笔者翻遍了整个仓库 192 个 Java 文件 30392 行代码 结果 `BackdropBlurPipeline` 命中次数为 **0** 压根不存在这么一个类 真正干活的是直接作为独立 entrypoint 缝在 `fabric.mod.json` 里的 `com.amethyst.blur.Blur` 顺便一提 作者在 `fabric.mod.json` 里一口气缝了四个客户端入口（`Client` `McPacksMod` `ReplayClient` `Blur`） 却给整个模组起了一个史诗级 modid 叫 **`"client"`** 仿佛全宇宙的 1.8.9 模组生态里只有他一家配叫 client 生怕不和别人的模组撞 ID
 
-### 二 跑 2015 年的 1.8.9 需要 Java 25 LTS 以及永远执行不到的温馨提示
+### 二 1.8.9 强制 Java 21+ 配小众 Legacy Fabric 以及永远执行不到的温馨提示
 
-很多玩家还在用 2015 年的 Minecraft 1.8.9 就是图它轻快 省配置 低版本 JVM 就能跑得飞起 而 Amethyst Client 决定用实际行动教育一下这群保守派：`build.gradle` 直接锁定 `options.release = 21` `fabric.mod.json` 写明 `"java": ">=21"` 并在简介里和 `EnvCheck.java` 里反复按头安利 **Java 25 LTS**
+众所周知 2015 年的 Minecraft 1.8.9 整个正统生态基本都是 **Forge + Java 8** 走天下 无论是各种老牌 1.8.9 PvP 模组还是主流启动器的默认配置 全是照着 Java 8 来的 而且 **[Fabric 官方](https://fabricmc.net/)从诞生起就是面向 1.14 及以上版本 压根就不支持 1.8.9**
 
-硬要让十一年前的方块游戏在最新的 Java 25 上起飞也就算了 毕竟尊重个人爱好 最让笔者绷不住的是 `net.client.util.EnvCheck` 里写了整整 **406 行** 去检测玩家的 Java 版本 甚至极其贴心地写了这么一个分支：
+结果 Amethyst Client 偏偏要走一条反直觉的逆行大道：抛弃生态最肥美的 1.8.9 Forge 转头绑死在极冷门的第三方分支 **Legacy Fabric** 上 更令普通玩家两眼一黑的是 打开国内最常用的 **PCL2 启动器** 准备建一个 1.8.9 实例时 你会发现安装列表里只有 `Forge` `OptiFine` `LiteLoader` **压根就没有 1.8.9 Fabric / Legacy Fabric 的安装入口**
+
+![PCL2 1.8.9 安装界面](images/pcl2-1.8.9.png)
+
+> 请注意这已经是 PCL2 给 1.8.9 提供的全部加载器选项了 想装这个客户端还得自己到处找 Legacy Fabric 安装器或者手搓实例 json
+
+你以为折腾完小众加载器就能愉快进游戏了吗 格局小了 1.8.9 玩家好不容易配好 Java 8 刚点启动直接炸脸 因为 Amethyst Client 直接把整个项目的编译目标锁死在了 **Java 21**（原版 `Amethyst-Client-1.0.1.jar` 里全部 **278 个 `.class` 文件**字节码主版本号清一色是 **65**） `fabric.mod.json` 写明 `"java": ">=21"` 简介和 `EnvCheck.java` 里甚至反复按头安利 **Java 25 LTS**
+
+硬要让十一年前本该用 Java 8 启动的老版本在 Java 25 上起飞也就算了 毕竟尊重个人爱好 最让笔者绷不住的是 `net.client.util.EnvCheck` 里写了整整 **406 行** 去检测玩家的 Java 版本 甚至极其贴心地写了这么一个分支：
 
 ```java
 if (major < 21) {
@@ -84,7 +92,7 @@ if (major < 21) {
 }
 ```
 
-哥们 你字节码本身都是按 **Java 21（class version 65）** 编译的啊 如果玩家真的用了 Java 8 或者 Java 17 启动 JVM 在加载你这个 `EnvCheck.class` 之前就已经一巴掌拍出一个 `UnsupportedClassVersionError` 直接原地螺旋升天了 你这行苦口婆心的中文提示大概只有在平行宇宙或者下五个[地质年代](https://zh.wikipedia.org/zh-hans/%E5%9C%B0%E8%B4%A8%E5%B9%B4%E4%BB%A3)里才有机会被执行一次
+哥们 你字节码本身都是按 **Java 21（class version 65）** 编译的啊 如果 1.8.9 玩家按常识用了 Java 8 启动 JVM 在加载你这个 `EnvCheck.class` 之前就已经一巴掌拍出一个 `UnsupportedClassVersionError` 直接原地螺旋升天了 你这行苦口婆心的中文提示大概只有在平行宇宙或者下五个[地质年代](https://zh.wikipedia.org/zh-hans/%E5%9C%B0%E8%B4%A8%E5%B9%B4%E4%BB%A3)里才有机会被执行一次
 
 ### 三 13.65 MB 客户端里塞了 15 MB 静态字库 还没打架先把显卡喂饱
 
@@ -136,7 +144,7 @@ if (!started && modIds != null && !modIds.isEmpty() || !started) {
 2. 把 `ClientScreen.java` 那 3277 行拆一拆 把 `SettingsSpec` 的魔法数字换成正经枚举 顺便把永远不会跑到的 `if (major < 21)` 和只负责抛异常的 `probeNanoVg()` 删了
 3. 别再拿正则和 `m.start() - 900` 暴力切片解析 JSON 了 Gson 就在你的 classpath 里躺着呢 还有把 `ModrinthUpdater` 那行 `|| !started` 和 `Accounts` 的 `"session"` 反射修修
 4. 既然都写了五千字 `All-Rights-Reserved` 禁止反编译 至少给 jar 加个混淆或者别把 `THIRD_PARTY.md` 里不存在的幽灵类写进文档里
-
+5. 给你的雷霆UI换成nanovg渲染 
 什么？你这个要求 Java 25 推荐环境 塞了 309 MB 字体显存和 854 行手写 JPEG 编码器的 1.8.9 闭源 PvP 客户端 连一行混淆都没加就直接发 Release 了。？那没事了。！
 
-你就继续烘字库吧 15 张静态图集一点都不重 3277 行单文件一点都不累 闭源协议猛贴 大 token 猛烧 给 Minecraft 1.8.9 生态继续输送更多雷霆大肥美杰作
+你就继续搞字库吧 15 张静态图集一点都不重 3277 行单文件一点都不累 闭源协议猛贴 大 token 猛烧 给 Minecraft 1.8.9 生态继续输送更多雷霆大肥美杰作
